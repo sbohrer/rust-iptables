@@ -24,57 +24,57 @@ fn test_old() {
 }
 
 fn nat(ipt: iptables::IPTables, old_name: &str, new_name: &str) {
-    assert_eq!(ipt.new_chain("nat", old_name).unwrap(), true);
-    assert_eq!(ipt.rename_chain("nat", old_name, new_name).unwrap(), true);
-    assert_eq!(ipt.append("nat", new_name, "-j ACCEPT").unwrap(), true);
+    assert_eq!(ipt.new_chain("nat", old_name).is_ok(), true);
+    assert_eq!(ipt.rename_chain("nat", old_name, new_name).is_ok(), true);
+    assert_eq!(ipt.append("nat", new_name, "-j ACCEPT").is_ok(), true);
     assert_eq!(ipt.exists("nat", new_name, "-j ACCEPT").unwrap(), true);
-    assert_eq!(ipt.delete("nat", new_name, "-j ACCEPT").unwrap(), true);
-    assert_eq!(ipt.insert("nat", new_name, "-j ACCEPT", 1).unwrap(), true);
-    assert_eq!(ipt.append("nat", new_name, "-m comment --comment \"Really long comments are truncated to 255 characters.  Test to ensure that truncated comments still match after rule has been installed.  This mainly needs to be tested for old versions of iptable that do not have check-funtionality since we must process the command ourselves for comparison.\" -j ACCEPT").unwrap(), true);
+    assert_eq!(ipt.delete("nat", new_name, "-j ACCEPT").is_ok(), true);
+    assert_eq!(ipt.insert("nat", new_name, "-j ACCEPT", 1).is_ok(), true);
+    assert_eq!(ipt.append("nat", new_name, "-m comment --comment \"Really long comments are truncated to 255 characters.  Test to ensure that truncated comments still match after rule has been installed.  This mainly needs to be tested for old versions of iptable that do not have check-funtionality since we must process the command ourselves for comparison.\" -j ACCEPT").is_ok(), true);
     assert_eq!(ipt.exists("nat", new_name, "-m comment --comment \"Really long comments are truncated to 255 characters.  Test to ensure that truncated comments still match after rule has been installed.  This mainly needs to be tested for old versions of iptable that do not have check-funtionality since we must process the command ourselves for comparison.\" -j ACCEPT").unwrap(), true);
-    assert_eq!(ipt.append("nat", new_name, "-m comment --comment \"double-quoted comment\" -j ACCEPT").unwrap(), true);
+    assert_eq!(ipt.append("nat", new_name, "-m comment --comment \"double-quoted comment\" -j ACCEPT").is_ok(), true);
     assert_eq!(ipt.exists("nat", new_name, "-m comment --comment \"double-quoted comment\" -j ACCEPT").unwrap(), true);
-    assert_eq!(ipt.append("nat", new_name, "-m comment --comment \"double-quoted comment with \'nested quote\' and more\" -j ACCEPT").unwrap(), true);
+    assert_eq!(ipt.append("nat", new_name, "-m comment --comment \"double-quoted comment with \'nested quote\' and more\" -j ACCEPT").is_ok(), true);
     assert_eq!(ipt.exists("nat", new_name, "-m comment --comment \"double-quoted comment with \'nested quote\' and more\" -j ACCEPT").unwrap(), true);
-    assert_eq!(ipt.append("nat", new_name, "-m comment --comment 'single-quoted comment' -j ACCEPT").unwrap(), true);
+    assert_eq!(ipt.append("nat", new_name, "-m comment --comment 'single-quoted comment' -j ACCEPT").is_ok(), true);
     assert_eq!(ipt.exists("nat", new_name, "-m comment --comment 'single-quoted comment' -j ACCEPT").unwrap(), true);
     // The following `exists`-check uses double-quotes, since the iptables output (if it
     // doesn't have the check-functionality) will use double quotes.
     assert_eq!(ipt.exists("nat", new_name, "-m comment --comment \"single-quoted comment\" -j ACCEPT").unwrap(), true);
-    assert_eq!(ipt.flush_chain("nat", new_name).unwrap(), true);
+    assert_eq!(ipt.flush_chain("nat", new_name).is_ok(), true);
     assert_eq!(ipt.exists("nat", new_name, "-j ACCEPT").unwrap(), false);
     assert!(ipt.execute("nat", &format!("-A {} -j ACCEPT", new_name)).is_ok());
     assert_eq!(ipt.exists("nat", new_name, "-j ACCEPT").unwrap(), true);
-    assert_eq!(ipt.flush_chain("nat", new_name).unwrap(), true);
+    assert_eq!(ipt.flush_chain("nat", new_name).is_ok(), true);
     assert_eq!(ipt.chain_exists("nat", new_name).unwrap(), true);
-    assert_eq!(ipt.delete_chain("nat", new_name).unwrap(), true);
+    assert_eq!(ipt.delete_chain("nat", new_name).is_ok(), true);
     assert_eq!(ipt.chain_exists("nat", new_name).unwrap(), false);
 }
 
 fn filter(ipt: iptables::IPTables, name: &str) {
-    assert_eq!(ipt.new_chain("filter", name).unwrap(), true);
-    assert_eq!(ipt.insert("filter", name, "-j ACCEPT", 1).unwrap(), true);
-    assert_eq!(ipt.replace("filter", name, "-j DROP", 1).unwrap(), true);
+    assert_eq!(ipt.new_chain("filter", name).is_ok(), true);
+    assert_eq!(ipt.insert("filter", name, "-j ACCEPT", 1).is_ok(), true);
+    assert_eq!(ipt.replace("filter", name, "-j DROP", 1).is_ok(), true);
     assert_eq!(ipt.exists("filter", name, "-j DROP").unwrap(), true);
     assert_eq!(ipt.exists("filter", name, "-j ACCEPT").unwrap(), false);
-    assert_eq!(ipt.delete("filter", name, "-j DROP").unwrap(), true);
+    assert_eq!(ipt.delete("filter", name, "-j DROP").is_ok(), true);
     assert_eq!(ipt.list("filter", name).unwrap().len(), 1);
     assert!(ipt.execute("filter", &format!("-A {} -j ACCEPT", name)).is_ok());
     assert_eq!(ipt.exists("filter", name, "-j ACCEPT").unwrap(), true);
-    assert_eq!(ipt.append("filter", name, "-m comment --comment \"Really long comments are truncated to 255 characters.  Test to ensure that truncated comments still match after rule has been installed.  This mainly needs to be tested for old versions of iptable that don't have check-funtionality since we must process the command ourselves for comparison.\" -j ACCEPT").unwrap(), true);
+    assert_eq!(ipt.append("filter", name, "-m comment --comment \"Really long comments are truncated to 255 characters.  Test to ensure that truncated comments still match after rule has been installed.  This mainly needs to be tested for old versions of iptable that don't have check-funtionality since we must process the command ourselves for comparison.\" -j ACCEPT").is_ok(), true);
     assert_eq!(ipt.exists("filter", name, "-m comment --comment \"Really long comments are truncated to 255 characters.  Test to ensure that truncated comments still match after rule has been installed.  This mainly needs to be tested for old versions of iptable that don't have check-funtionality since we must process the command ourselves for comparison.\" -j ACCEPT").unwrap(), true);
-    assert_eq!(ipt.append("filter", name, "-m comment --comment \"double-quoted comment\" -j ACCEPT").unwrap(), true);
+    assert_eq!(ipt.append("filter", name, "-m comment --comment \"double-quoted comment\" -j ACCEPT").is_ok(), true);
     assert_eq!(ipt.exists("filter", name, "-m comment --comment \"double-quoted comment\" -j ACCEPT").unwrap(), true);
-    assert_eq!(ipt.append("filter", name, "-m comment --comment \"double-quoted comment with \'nested quote\'\" -j ACCEPT").unwrap(), true);
+    assert_eq!(ipt.append("filter", name, "-m comment --comment \"double-quoted comment with \'nested quote\'\" -j ACCEPT").is_ok(), true);
     assert_eq!(ipt.exists("filter", name, "-m comment --comment \"double-quoted comment with \'nested quote\'\" -j ACCEPT").unwrap(), true);
-    assert_eq!(ipt.append("filter", name, "-m comment --comment 'single-quoted comment' -j ACCEPT").unwrap(), true);
+    assert_eq!(ipt.append("filter", name, "-m comment --comment 'single-quoted comment' -j ACCEPT").is_ok(), true);
     assert_eq!(ipt.exists("filter", name, "-m comment --comment 'single-quoted comment' -j ACCEPT").unwrap(), true);
     // The following `exists`-check uses double-quotes, since the iptables output (if it
     // doesn't have the check-functionality) will use double quotes.
     assert_eq!(ipt.exists("filter", name, "-m comment --comment \"single-quoted comment\" -j ACCEPT").unwrap(), true);
-    assert_eq!(ipt.flush_chain("filter", name).unwrap(), true);
+    assert_eq!(ipt.flush_chain("filter", name).is_ok(), true);
     assert_eq!(ipt.chain_exists("filter", name).unwrap(), true);
-    assert_eq!(ipt.delete_chain("filter", name).unwrap(), true);
+    assert_eq!(ipt.delete_chain("filter", name).is_ok(), true);
     assert_eq!(ipt.chain_exists("filter", name).unwrap(), false);
 }
 
@@ -122,7 +122,7 @@ fn test_set_policy() {
     // If the following assertions fail or any other panic occurs, we still have to ensure not to
     // change the policy for the user.
     let result = panic::catch_unwind(|| {
-        assert_eq!(ipt.set_policy("mangle", "FORWARD", "DROP").unwrap(), true);
+        assert_eq!(ipt.set_policy("mangle", "FORWARD", "DROP").is_ok(), true);
         assert_eq!(ipt.get_policy("mangle", "FORWARD").unwrap(), "DROP");
     });
 

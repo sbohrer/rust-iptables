@@ -1,7 +1,7 @@
-extern crate regex;
 extern crate nix;
 
-use std::{fmt, error, io, convert, num};
+extern crate regex;
+use std::{convert, error, fmt, io, num};
 
 /// Defines the general error type of iptables crate
 #[derive(Debug)]
@@ -10,7 +10,7 @@ pub enum IPTError {
     Regex(regex::Error),
     Nix(nix::Error),
     Parse(num::ParseIntError),
-    Other(&'static str),
+    Other(String),
 }
 
 /// Defines the Result type of iptables crate
@@ -39,7 +39,7 @@ impl error::Error for IPTError {
         }
     }
 
-    fn cause(&self) -> Option<&error::Error> {
+    fn cause(&self) -> Option<&dyn error::Error> {
         match *self {
             IPTError::Io(ref err) => Some(err),
             IPTError::Regex(ref err) => Some(err),
@@ -76,6 +76,6 @@ impl convert::From<num::ParseIntError> for IPTError {
 
 impl convert::From<&'static str> for IPTError {
     fn from(err: &'static str) -> Self {
-        IPTError::Other(err)
+        IPTError::Other(err.to_owned())
     }
 }
