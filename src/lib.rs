@@ -147,7 +147,7 @@ impl IPTables {
             return Err(IPTError::Other("given chain is not a default chain in the given table, can't get policy".to_string()));
         }
 
-        let output = String::from_utf8_lossy(&self.run(&["-t", table, "-L", chain])?.stdout)
+        let output = String::from_utf8_lossy(&self.run(&["-t", table, "-L", chain, "--numeric"])?.stdout)
             .into_owned();
         for item in output.trim().split("\n") {
             let fields = item.split(" ").collect::<Vec<&str>>();
@@ -201,7 +201,7 @@ impl IPTables {
     /// Returns true if the chain exists.
     #[cfg(target_os = "linux")]
     pub fn chain_exists(&self, table: &str, chain: &str) -> IPTResult<bool> {
-        match self.run(&["-t", table, "-L", chain]) {
+        match self.run(&["-t", table, "-L", chain, "--numeric"]) {
             Ok(output) => Ok(output.status.success()),
             Err(err) => Err(err),
         }
