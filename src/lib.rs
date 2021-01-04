@@ -58,7 +58,17 @@ impl SplitQuoted for str {
             // Get match as str
             .map(|m| Match::as_str(&m))
             // Remove any surrounding quotes (they will be reinserted by `Command`)
-            .map(|s| s.trim_matches(|c| c == '"' || c == '\''))
+            // Use stip not trim to only remove outer quotes if there are multiple nested quotes
+            .map(|s| {
+                let s = match &s.strip_prefix(|c| c == '"' || c == '\'') {
+                    Some(s) => s,
+                    None => s,
+                };
+                match &s.strip_suffix(|c| c == '"' || c == '\'') {
+                    Some(s) => s,
+                    None => s,
+                }
+            })
             // Collect
             .collect::<Vec<_>>()
     }
